@@ -1,0 +1,17 @@
+所有的配置都弄好之后，包括将公钥通过页面配置到github里，下面需要
+
+1. 在单个项目下，执行
+git config --local user.name ""
+git config --local user.email ""
+执行完可到项目的.git/config 里查看
+
+2. 将私钥加到缓存中
+ssh-agent -s 
+ssh-add ~/.ssh/github_id_rsa
+
+3. 解决新开idea terminal(使用的是git bash的exe)就得重新ssh-add 私钥的问题
+进入git安装目录下，寻找bash.bashrc文件
+在末尾添加两行：
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/github_id_rsa
+这样就可以实现启动git bash，便可以直接进行 git 操作了
