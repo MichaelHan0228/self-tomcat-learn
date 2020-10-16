@@ -1,7 +1,8 @@
 package com.han.oa.servlet;
 
-import com.han.httpserver.core.ResponseObject;
+import com.han.httpserver.core.RequestObject;
 import com.han.javax.servlet.Servlet;
+import com.han.javax.servlet.ServletRequest;
 import com.han.javax.servlet.ServletResponse;
 
 import java.io.PrintWriter;
@@ -15,7 +16,8 @@ import java.io.PrintWriter;
  */
 public class LoginServlet implements Servlet {
 
-    public void service(ServletResponse response) {
+    @Override
+    public void service(ServletRequest request, ServletResponse response) {
         PrintWriter out = response.getWriter();
         out.print("HTTP/1.1 200 OK\n");
         out.print("Content-Type:text/html;charset=utf-8\n\n");

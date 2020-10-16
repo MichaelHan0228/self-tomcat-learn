@@ -1,9 +1,6 @@
 package com.han.httpserver.core;
 
 import com.han.javax.servlet.Servlet;
-import com.han.oa.servlet.LoginServlet;
-
-import javax.xml.ws.Response;
 import java.io.*;
 import java.net.Socket;
 import java.util.Map;
@@ -55,28 +52,23 @@ public class RequestHandler implements Runnable {
                 String webAppName = servletPath.split("[/]")[1];
                 Map<String, String> servletMap = WebParser.servletMaps.get(webAppName);
                 String urlPattern = servletPath.substring(1 + webAppName.length());
-
                 String servletClassName = servletMap.get(urlPattern);
+
                 if (servletClassName != null) {
                     ResponseObject responseObject = new ResponseObject();
                     responseObject.setWriter(out);
+                    RequestObject requestObject = new RequestObject(requestURI);
+                    // 响应不要忘了响应头
+                    out.print("HTTP/1.1 200 OK\n");
+                    out.print("Content-Type:text/html;charset=utf-8\n\n");
                     // 利用反射机制
                     Class c = Class.forName(servletClassName);
                     Object obj = c.newInstance();
                     Servlet servlet = (Servlet) obj;
-                    servlet.service(responseObject);
+                    servlet.service(requestObject, responseObject);
                 } else {
                     // 找不到资源 404
-                    StringBuilder html = new StringBuilder();
-                    html.append("HTTP/1.1 404 NotFound\n");
-                    html.append("Content-Type:text/html;charset=utf-8\n\n");
-                    html.append("<html>");
-                    html.append("<head>");
-                    html.append("<meta charset='UTF-8'>");
-                    html.append("<title>404-Not Found</title>");
-                    html.append("</head>");
-                    html.append("<body><div style='text-align: center;'><span style='font-size: 35px; color: red'>404-Not Found</span></div></body>");
-                    html.append("</html>");
+                    String html = generate404Page();
                     out.print(html);
                 }
                 out.flush();
@@ -127,19 +119,24 @@ public class RequestHandler implements Runnable {
             }
             out.print(html);
         } catch (FileNotFoundException e) {
-            StringBuilder html = new StringBuilder();
-            html.append("HTTP/1.1 404 NotFound\n");
-            html.append("Content-Type:text/html;charset=utf-8\n\n");
-            html.append("<html>");
-            html.append("<head>");
-            html.append("<meta charset='UTF-8'>");
-            html.append("<title>404-Not Found</title>");
-            html.append("</head>");
-            html.append("<body><div style='text-align: center;'><span style='font-size: 35px; color: red'>404-Not Found</span></div></body>");
-            html.append("</html>");
+            String html = generate404Page();
             out.print(html);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private String generate404Page() {
+        StringBuilder html = new StringBuilder();
+        html.append("HTTP/1.1 404 NotFound\n");
+        html.append("Content-Type:text/html;charset=utf-8\n\n");
+        html.append("<html>");
+        html.append("<head>");
+        html.append("<meta charset='UTF-8'>");
+        html.append("<title>404-Not Found</title>");
+        html.append("</head>");
+        html.append("<body><div style='text-align: center;'><span style='font-size: 35px; color: red'>404-Not Found</span></div></body>");
+        html.append("</html>");
+        return html.toString();
     }
 }
