@@ -30,7 +30,7 @@ public class BootStrap {
             logger.info("httpserver starting");
             long start = System.currentTimeMillis();
             // webAppNames, 这里先固定，服务器启动便解析web.xml
-            String[] webAppNames = {"oa"};
+            String[] webAppNames = {"oa", "bank"};
             WebParser.parseWebXML(webAppNames);
             // 获取配置信息的端口
             int port = ServerParser.getPort();
