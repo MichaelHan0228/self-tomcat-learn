@@ -4,6 +4,7 @@ import com.han.javax.servlet.Servlet;
 import java.io.*;
 import java.net.Socket;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * 使用多线程来处理请求
@@ -22,6 +23,7 @@ public class RequestHandler implements Runnable {
 
     @Override
     public void run() {
+        Logger logger = Logger.getGlobal();
         BufferedReader br = null;
         PrintWriter out = null;
         try {
@@ -61,10 +63,16 @@ public class RequestHandler implements Runnable {
                     // 响应不要忘了响应头
                     out.print("HTTP/1.1 200 OK\n");
                     out.print("Content-Type:text/html;charset=utf-8\n\n");
+
+                    // 使用单例
+                    Servlet servlet = ServletCache.getServlet(urlPattern);
+                    if (servlet == null) {
+                        Class c = Class.forName(servletClassName);
+                        Object obj = c.newInstance();
+                        servlet = (Servlet) obj;
+                        ServletCache.setServlet(urlPattern, servlet);
+                    }
                     // 利用反射机制
-                    Class c = Class.forName(servletClassName);
-                    Object obj = c.newInstance();
-                    Servlet servlet = (Servlet) obj;
                     servlet.service(requestObject, responseObject);
                 } else {
                     // 找不到资源 404
