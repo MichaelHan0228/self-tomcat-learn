@@ -46,7 +46,6 @@ public class ActTransferServlet implements Servlet {
             ps.setString(2, actTo);
             count += ps.executeUpdate();
 
-
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
